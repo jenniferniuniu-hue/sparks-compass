@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPARKS Compass Passport</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --accent: #e8a020;
+    --light-bg: #f4f6f9;
+    --card-bg: #ffffff;
+    --border: #d0d8e4;
+    --text: #2c3e50;
+    --muted: #7f8c9a;
+    --success: #27ae60;
+    --danger: #e74c3c;
+    --sa: #4e91d5;
+    --cl: #e8a020;
+    --gs: #2ecc71;
+    --tr: #9b59b6;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    background: var(--light-bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── TOP NAV ── */
+  .top-nav {
+    background: var(--primary);
+    color: #fff;
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  }
+  .top-nav .logo {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .top-nav .logo svg { width: 28px; height: 28px; }
+  .nav-btn {
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.3);
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background .2s;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,.28); }
+
+  /* ── PAGE WRAPPER ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── HERO / LANDING ── */
+  .hero {
+    text-align: center;
+    padding: 60px 20px 40px;
+  }
+  .hero h1 {
+    font-size: 32px;
+    color: var(--primary);
+    margin-bottom: 10px;
+    font-weight: 800;
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 520px;
+    margin: 0 auto 36px;
+    line-height: 1.7;
+  }
+  .card-grid {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0 20px;
+  }
+  .role-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 28px;
+    width: 240px;
+    cursor: pointer;
+    transition: all .25s;
+    text-align: center;
+  }
+  .role-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(26,58,92,.12);
+  }
+  .role-card .icon { font-size: 44px; margin-bottom: 14px; }
+  .role-card h3 { font-size: 17px; color: var(--primary); margin-bottom: 6px; }
+  .role-card p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  /* ── CONTAINER ── */
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--card-bg);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    padding: 28px 32px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--light-bg);
+  }
+  .card-header .badge {
+    background: var(--primary);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: .5px;
+  }
+  .card-header h2 {
+    font-size: 17px;
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  /* ── FORM ── */
+  .form-group { margin-bottom: 18px; }
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text);
+    background: #fff;
+    transition: border-color .2s;
+    font-family: inherit;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+  .form-group textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* ── ABILITY SCORE ── */
+  .ability-block {
+    background: var(--light-bg);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    border-left: 4px solid var(--primary);
+  }
+  .ability-block.sa { border-color: var(--sa); }
+  .ability-block.cl { border-color: var(--cl); }
+  .ability-block.gs { border-color: var(--gs); }
+  .ability-block.tr { border-color: var(--tr); }
+
+  .ability-title {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--primary);
+    margin-bottom: 4px;
+  }
+  .ability-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .score-row label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    width: 100px;
+    flex-shrink: 0;
+  }
+  .star-rating {
+    display: flex;
+    gap: 4px;
+  }
+  .star-rating input { display: none; }
+  .star-rating label {
+    font-size: 24px;
+    color: #ccc;
+    cursor: pointer;
+    transition: color .15s;
+    width: auto;
+  }
+  .star-rating label:hover,
+  .star-rating label.active { color: var(--accent); }
+
+  .reason-input {
+    font-size: 13px;
+    padding: 8px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    width: 100%;
+    margin-top: 8px;
+    font-family: inherit;
+    color: var(--text);
+    transition: border-color .2s;
+  }
+  .reason-input:focus { outline: none; border-color: var(--primary); }
+
+  /* ── MASTERY SCALE ── */
+  .mastery-scale {
+    background: linear-gradient(135deg, #f0f4ff, #e8f4ff);
+    border: 1px solid #c8d8f0;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 12.5px;
+    line-height: 1.8;
+    color: var(--text);
+  }
+  .mastery-scale strong { color: var(--primary); }
+
+  /* ── CHOICE GRID ── */
+  .choice-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .choice-item {
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    transition: all .2s;
+    text-align: center;
+  }
+  .choice-item:hover { border-color: var(--primary); color: var(--primary); background: #f0f4ff; }
+  .choice-item.selected { border-color: var(--primary); background: var(--primary); color: #fff; }
+
+  /* ── PEER SECTION ── */
+  .peer-box {
+    background: linear-gradient(135deg, #fff8ee, #fff3e0);
+    border: 1.5px solid var(--accent);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+  }
+  .peer-box h3 { color: var(--primary); font-size: 16px; margin-bottom: 8px; }
+  .peer-box p { font-size: 13px; color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
+  .peer-link-display {
+    background: #fff;
+    border: 1.5px dashed var(--accent);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--muted);
+    word-break: break-all;
+    margin-bottom: 12px;
+    text-align: left;
+    font-family: monospace;
+    display: none;
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    padding: 10px 24px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    transition: all .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+  }
+  .btn-primary:hover { background: #0f2a47; }
+  .btn-accent {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-accent:hover { background: #c98010; }
+  .btn-outline {
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+  }
+  .btn-outline:hover { background: var(--primary); color: #fff; }
+  .btn-success {
+    background: var(--success);
+    color: #fff;
+  }
+  .btn-success:hover { background: #219a52; }
+  .btn-sm { padding: 6px 14px; font-size: 12px; }
+  .btn-block { width: 100%; justify-content: center; }
+
+  .action-row {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap {
+    background: var(--border);
+    border-radius: 4px;
+    height: 6px;
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 4px;
+    transition: width .4s ease;
+  }
+  .progress-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    text-align: right;
+  }
+
+  /* ── STEP NAV ── */
+  .step-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .step-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--border);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-dot.done { background: var(--success); color: #fff; }
+  .step-dot.active { background: var(--primary); color: #fff; }
+  .step-line { flex: 1; height: 2px; background: var(--border); min-width: 10px; }
+
+  /* ── TEACHER ── */
+  .login-box {
+    max-width: 360px;
+    margin: 60px auto;
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 36px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.08);
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .login-box .icon { font-size: 48px; margin-bottom: 16px; }
+  .login-box h2 { color: var(--primary); margin-bottom: 8px; }
+  .login-box p { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+  .login-error { color: var(--danger); font-size: 13px; margin-top: 8px; display: none; }
+
+  /* ── TEACHER DASHBOARD ── */
+  .student-summary-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  }
+  .student-summary-card .stu-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .stu-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .stu-info h3 { font-size: 16px; color: var(--primary); margin-bottom: 2px; }
+  .stu-info p { font-size: 12px; color: var(--muted); }
+  .radar-container { position: relative; height: 280px; }
+  .score-chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+  }
+  .score-chip {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .chip-sa { background: var(--sa); }
+  .chip-cl { background: var(--cl); }
+  .chip-gs { background: var(--gs); }
+  .chip-tr { background: var(--tr); }
+
+  /* ── SUPERVISOR SECTION ── */
+  .supervisor-block {
+    background: #f8f0ff;
+    border: 1.5px solid #9b59b6;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-top: 16px;
+  }
+  .supervisor-block h4 { color: #6c3483; font-size: 14px; margin-bottom: 14px; }
+  .sup-ability-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .sup-ability-row label {
+    width: 120px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+  .sup-ability-row input[type=number] {
+    width: 70px;
+    padding: 6px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .sup-ability-row input[type=text] {
+    flex: 1;
+    min-width: 160px;
+    padding: 6px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+
+  /* ── UPLOAD AREA ── */
+  .upload-area {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .2s;
+    margin-bottom: 24px;
+  }
+  .upload-area:hover { border-color: var(--primary); background: #f0f4ff; }
+  .upload-area .icon { font-size: 40px; margin-bottom: 10px; }
+  .upload-area p { color: var(--muted); font-size: 14px; }
+  .upload-area small { font-size: 12px; color: #bbb; display: block; margin-top: 4px; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #2c3e50;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.2);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all .3s;
+    z-index: 999;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { background: var(--success); }
+
+  /* ── INTRO BOX ── */
+  .intro-text {
+    font-size: 13.5px;
+    line-height: 1.8;
+    color: var(--muted);
+    background: #f8faff;
+    border-left: 3px solid var(--primary);
+    padding: 14px 18px;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 6px;
+  }
+
+  /* ── PEER PAGE ── */
+  .peer-header-banner {
+    background: linear-gradient(135deg, var(--primary), #2c5f8a);
+    color: #fff;
+    padding: 32px;
+    border-radius: 14px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .peer-header-banner h2 { font-size: 22px; margin-bottom: 8px; }
+  .peer-header-banner p { opacity: .85; font-size: 14px; }
+
+  /* ── ACCORDION ── */
+  details { margin-bottom: 10px; }
+  details summary {
+    cursor: pointer;
+    padding: 10px 14px;
+    background: var(--light-bg);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    list-style: none;
+    user-select: none;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details[open] summary { border-radius: 8px 8px 0 0; }
+  details .detail-body {
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+    .choice-grid { grid-template-columns: 1fr; }
+    .card { padding: 20px 16px; }
+    .score-row { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="logo">
+    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="14" cy="14" r="13" stroke="white" stroke-width="2"/>
+      <path d="M14 4 L17 11 L24 11 L18.5 15.5 L20.5 22.5 L14 18 L7.5 22.5 L9.5 15.5 L4 11 L11 11 Z" fill="white"/>
+    </svg>
+    SPARKS Compass
+  </div>
+  <div id="navRight">
+    <button class="nav-btn" onclick="showPage('home')">🏠 Home</button>
+  </div>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: HOME
+═══════════════════════════════════════════ -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <h1>SPARKS Compass Passport</h1>
+    <p>Document your growth through authentic project-based experiences. Choose your role to begin.</p>
+    <div class="card-grid">
+      <div class="role-card" onclick="showPage('student')">
+        <div class="icon">🎒</div>
+        <h3>Student</h3>
+        <p>Fill in your self-assessment, evidence of learning, and reflection</p>
+      </div>
+      <div class="role-card" onclick="initPeerPage()">
+        <div class="icon">🤝</div>
+        <h3>Peer Reviewer</h3>
+        <p>Open a peer feedback link sent by your teammate</p>
+      </div>
+      <div class="role-card" onclick="showTeacherLogin()">
+        <div class="icon">👩‍🏫</div>
+        <h3>Teacher</h3>
+        <p>View student submissions, radar charts, and provide supervisor comments</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: STUDENT
+═══════════════════════════════════════════ -->
+<div class="page" id="page-student">
+<div class="container">
+
+  <!-- Step Nav -->
+  <div class="step-nav" id="stepNav">
+    <div class="step-dot active" id="dot0">0</div>
+    <div class="step-line"></div>
+    <div class="step-dot" id="dot1">1</div>
+    <div class="step-line"></div>
+    <div class="step-dot" id="dot2">2</div>
+    <div class="step-line"></div>
+    <div class="step-dot" id="dot3">3</div>
+    <div class="step-line"></div>
+    <div class="step-dot" id="dot4">4</div>
+  </div>
+  <div class="progress-label" id="progressLabel">Step 1 of 5</div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:20%"></div></div>
+
+  <!-- STEP 0: Basic Info -->
+  <div id="step0">
+    <div class="card">
+      <div class="card-header">
+        <span class="badge">PART 0</span>
+        <h2>Basic Information</h2>
+      </div>
+      <div class="intro-text">
+        The SPARKS Compass Passport documents students' growth through authentic project-based experiences.
+        It focuses on the development of key capabilities beyond academic learning, encouraging students to explore real-world issues,
+        collaborate with others, and reflect on their personal growth.
+      </div>
+      <br>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Student Name *</label>
+          <input type="text" id="s_name" placeholder="Your full name">
+        </div>
+        <div class="form-group">
+          <label>Email Address *</label>
+          <input type="email" id="s_email" placeholder="your@email.com">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Grade</label>
+          <input type="text" id="s_grade" placeholder="e.g. Grade 10">
+        </div>
+        <div class="form-group">
+          <label>Group</label>
+          <input type="text" id="s_group" placeholder="e.g. Group A">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Academic Year</label>
+        <input type="text" id="s_year" value="2025/2026">
+      </div>
+      <div class="action-row">
+        <button class="btn btn-primary" onclick="goStep(1)">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 1: Ability Self-Assessment -->
+  <div id="step1" style="display:none">
+    <div class="card">
+      <div class="card-header">
+        <span class="badge">PART 1</span>
+        <h2>Ability Self-Assessment</h2>
+      </div>
+
+      <details>
+        <summary>📖 Mastery Scale Guide (click to expand)</summary>
+        <div class="detail-body">
+          <strong>1 – Not observed:</strong> I have not yet demonstrated this ability in my project.<br>
+          <strong>2 – Novice:</strong> I am beginning to try this ability and need guidance.<br>
+          <strong>3 – Learner:</strong> I sometimes demonstrate this ability during activities.<br>
+          <strong>4 – Practitioner:</strong> I consistently demonstrate this ability independently.<br>
+          <strong>5 – Expert:</strong> I apply this ability confidently and actively support others.
+        </div>
+      </details>
+      <br>
+
+      <!-- SA -->
+      <div class="ability-block sa">
+        <div class="ability-title">SA — Self &amp; Agency</div>
+        <div class="ability-desc">I can set personal learning goals and proactively seek resources to complete tasks.<br><small>Alignment with UWC: Self-Management, Project Management (personal level)</small></div>
+        <div class="score-row">
+          <label>Your score</label>
+          <div class="star-rating" id="stars_sa"></div>
+        </div>
+        <input type="text" class="reason-input" id="reason_sa" placeholder="Reason / evidence for your self-score...">
+      </div>
+
+      <!-- CL -->
+      <div class="ability-block cl">
+        <div class="ability-title">CL — Collaboration &amp; Leadership</div>
+        <div class="ability-desc">I listen to others' perspectives and work toward balanced solutions when conflicts arise.<br><small>Alignment with UWC: Social Skills, Communication Skills, Pedagogical Skills</small></div>
+        <div class="score-row">
+          <label>Your score</label>
+          <div class="star-rating" id="stars_cl"></div>
+        </div>
+        <input type="text" class="reason-input" id="reason_cl" placeholder="Reason / evidence for your self-score...">
+      </div>
+
+      <!-- GS -->
+      <div class="ability-block gs">
+        <div class="ability-title">GS — Global Citizenship &amp; Service</div>
+        <div class="ability-desc">I am aware of global issues and reflect on how my actions can positively impact my community.<br><small>Alignment with UWC: Project Management (action level), Digital Skills</small></div>
+        <div class="score-row">
+          <label>Your score</label>
+          <div class="star-rating" id="stars_gs"></div>
+        </div>
+        <input type="text" class="reason-input" id="reason_gs" placeholder="Reason / evidence for your self-score...">
+      </div>
+
+      <!-- TR -->
+      <div class="ability-block tr">
+        <div class="ability-title">TR — Thinking &amp; Reflection</div>
+        <div class="ability-desc">I use different thinking frameworks to analyse problems and objectively evaluate my strengths and areas for improvement.<br><small>Alignment with UWC: Thinking Skills, Research Skills</small></div>
+        <div class="score-row">
+          <label>Your score</label>
+          <div class="star-rating" id="stars_tr"></div>
+        </div>
+        <input type="text" class="reason-input" id="reason_tr" placeholder="Reason / evidence for your self-score...">
+      </div>
+
+      <div class="action-row">
+        <button class="btn btn-outline" onclick="goStep(0)">← Back</button>
+        <button class="btn btn-primary" onclick="goStep(2)">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Evidence of Learning -->
+  <div id="step2" style="display:none">
+    <div class="card">
+      <div class="card-header">
+        <span class="badge">PART 2</span>
+        <h2>Evidence of Learning</h2>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Please give concrete examples of your performance in this project.</p>
+
+      <div class="form-group">
+        <label>1. Your role in this project / 你在这个项目中的角色</label>
+        <textarea id="ev1" placeholder="Describe your role and responsibilities in the project..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>2. A specific contribution you made to your team / 你对团队的具体贡献</label>
+        <textarea id="ev2" placeholder="Give a specific example of something you contributed..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>3. A challenge you faced and how you addressed it / 你遇到的挑战及解决方法</label>
+        <textarea id="ev3" placeholder="Describe a challenge and your response to it..."></textarea>
+      </div>
+
+      <div class="action-row">
+        <button class="btn btn-outline" onclick="goStep(1)">← Back</button>
+        <button class="btn btn-primary" onclick="goStep(3)">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: Reflection -->
+  <div id="step3" style="display:none">
+    <div class="card">
+      <div class="card-header">
+        <span class="badge">PART 3</span>
+        <h2>Reflection</h2>
+      </div>
+
+      <div class="form-group">
+        <label>1. Which ability domain do you feel you grew the most in this project? / 你在哪个能力领域成长最多？</label>
+        <div class="choice-grid" style="margin-top:10px">
+          <div class="choice-item" onclick="selectGrowth('SA')">⭐ Self &amp; Agency</div>
+          <div class="choice-item" onclick="selectGrowth('CL')">🤝 Collaboration &amp; Leadership</div>
+          <div class="choice-item" onclick="selectGrowth('GS')">🌍 Global Citizenship</div>
+          <div class="choice-item" onclick="selectGrowth('TR')">💡 Thinking &amp; Reflection</div>
+        </div>
+        <input type="hidden" id="growth_choice" value="">
+      </div>
+
+      <div class="form-group" style="margin-top:20px">
+        <label>2. Why? / 为什么？</label>
+        <textarea id="growth_why" placeholder="Explain why you chose this domain and what evidence supports your growth..."></textarea>
+      </div>
+
+      <div class="action-row">
+        <button class="btn btn-outline" onclick="goStep(2)">← Back</button>
+        <button class="btn btn-primary" onclick="goStep(4)">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: Peer Feedback Link -->
+  <div id="step4" style="display:none">
+    <div class="card">
+      <div class="card-header">
+        <span class="badge">PART 4</span>
+        <h2>Peer Feedback</h2>
+      </div>
+
+      <div class="peer-box">
+        <h3>🔗 Generate Peer Feedback Link</h3>
+        <p>Generate a unique link and send it to a teammate. They will fill in feedback about your performance. You will <strong>not</strong> be able to see their responses until your teacher reviews.</p>
+        <div class="peer-link-display" id="peerLinkDisplay"></div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-accent" onclick="generatePeerLink()">⚡ Generate Link</button>
+          <button class="btn btn-outline btn-sm" id="copyBtn" onclick="copyPeerLink()" style="display:none">📋 Copy Link</button>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;padding:16px;background:var(--light-bg);border-radius:10px">
+        <p style="font-size:13px;color:var(--muted);">
+          💡 <strong>Note:</strong> Once you've generated and shared the link, you can proceed to submit your passport. Peer feedback will be added to your record separately.
+        </p>
+      </div>
+
+      <div class="action-row">
+        <button class="btn btn-outline" onclick="goStep(3)">← Back</button>
+        <button class="btn btn-success" onclick="submitStudentForm()">✅ Submit &amp; Download</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: PEER
+═══════════════════════════════════════════ -->
+<div class="page" id="page-peer">
+<div class="container" style="max-width:600px">
+  <div class="peer-header-banner">
+    <h2>🤝 Peer Feedback Form</h2>
+    <p>Your teammate has invited you to provide feedback on their project performance.</p>
+  </div>
+
+  <div class="card">
+    <div id="peerStudentInfo" style="margin-bottom:20px;padding:14px;background:var(--light-bg);border-radius:10px;font-size:13px;color:var(--text)">
+      Loading student info...
+    </div>
+
+    <div class="form-group">
+      <label>Your Name (Peer) *</label>
+      <input type="text" id="peer_name" placeholder="Enter your name">
+    </div>
+
+    <div class="form-group">
+      <label>1. What do you think was this student's greatest contribution to the team?</label>
+      <textarea id="peer_contribution" placeholder="Describe the most impactful contribution you observed..."></textarea>
+    </div>
+
+    <div style="margin-top:20px">
+      <p style="font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:14px">2. Rate this student on each ability (1–5):</p>
+
+      <div class="ability-block sa" style="margin-bottom:12px">
+        <div class="ability-title" style="font-size:13px">SA — Self &amp; Agency</div>
+        <div class="score-row" style="margin-top:8px">
+          <div class="star-rating" id="pstars_sa"></div>
+        </div>
+        <input type="text" class="reason-input" id="preason_sa" placeholder="Brief comment...">
+      </div>
+
+      <div class="ability-block cl" style="margin-bottom:12px">
+        <div class="ability-title" style="font-size:13px">CL — Collaboration &amp; Leadership</div>
+        <div class="score-row" style="margin-top:8px">
+          <div class="star-rating" id="pstars_cl"></div>
+        </div>
+        <input type="text" class="reason-input" id="preason_cl" placeholder="Brief comment...">
+      </div>
+
+      <div class="ability-block gs" style="margin-bottom:12px">
+        <div class="ability-title" style="font-size:13px">GS — Global Citizenship &amp; Service</div>
+        <div class="score-row" style="margin-top:8px">
+          <div class="star-rating" id="pstars_gs"></div>
+        </div>
+        <input type="text" class="reason-input" id="preason_gs" placeholder="Brief comment...">
+      </div>
+
+      <div class="ability-block tr">
+        <div class="ability-title" style="font-size:13px">TR — Thinking &amp; Reflection</div>
+        <div class="score-row" style="margin-top:8px">
+          <div class="star-rating" id="pstars_tr"></div>
+        </div>
+        <input type="text" class="reason-input" id="preason_tr" placeholder="Brief comment...">
+      </div>
+    </div>
+
+    <div class="action-row" style="margin-top:28px">
+      <button class="btn btn-success btn-block" onclick="submitPeerFeedback()">✅ Submit Peer Feedback &amp; Download</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: TEACHER LOGIN
+═══════════════════════════════════════════ -->
+<div class="page" id="page-teacher-login">
+  <div class="login-box">
+    <div class="icon">🔐</div>
+    <h2>Teacher Dashboard</h2>
+    <p>Enter your teacher password to access student submissions and radar charts.</p>
+    <div class="form-group">
+      <input type="password" id="teacherPwd" placeholder="Enter password" onkeydown="if(event.key==='Enter')teacherLogin()">
+    </div>
+    <button class="btn btn-primary btn-block" onclick="teacherLogin()">Login</button>
+    <div class="login-error" id="loginError">❌ Incorrect password. Please try again.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: TEACHER DASHBOARD
+═══════════════════════════════════════════ -->
+<div class="page" id="page-teacher">
+<div class="container" style="max-width:900px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+    <div>
+      <h2 style="color:var(--primary);font-size:22px">📊 Teacher Dashboard</h2>
+      <p style="font-size:13px;color:var(--muted);margin-top:4px">Review student submissions and radar charts</p>
+    </div>
+    <button class="btn btn-outline btn-sm" onclick="teacherLogout()">🚪 Logout</button>
+  </div>
+
+  <!-- Upload Area -->
+  <div class="upload-area" onclick="document.getElementById('jsonUpload').click()">
+    <div class="icon">📂</div>
+    <p>Click to import student JSON files</p>
+    <small>Supports: student passport files (.json) &amp; peer feedback files (_peer.json)</small>
+    <input type="file" id="jsonUpload" accept=".json" multiple style="display:none" onchange="loadStudentJSON(event)">
+  </div>
+
+  <!-- Student List -->
+  <div id="studentList">
+    <p style="text-align:center;color:var(--muted);font-size:14px;padding:40px">No submissions loaded yet. Import JSON files above.</p>
+  </div>
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// STATE & CONFIG
+// ═══════════════════════════════════════════
+const TEACHER_PASSWORD = 'sparks2026'; // Change this password here
+const ABILITIES = ['SA','CL','GS','TR'];
+const ABILITY_NAMES = {
+  SA: 'Self & Agency',
+  CL: 'Collaboration & Leadership',
+  GS: 'Global Citizenship & Service',
+  TR: 'Thinking & Reflection'
+};
+const ABILITY_COLORS = {
+  SA: '#4e91d5',
+  CL: '#e8a020',
+  GS: '#2ecc71',
+  TR: '#9b59b6'
+};
+
+let currentStep = 0;
+let studentData = {};
+let loadedStudents = []; // teacher view
+let peerStudentInfo = null;
+let radarCharts = {};
+
+// ═══════════════════════════════════════════
+// ROUTING
+// ═══════════════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function showTeacherLogin() {
+  showPage('teacher-login');
+}
+
+function initPeerPage() {
+  const hash = window.location.hash;
+  if (hash.startsWith('#peer?')) {
+    loadPeerPage(hash);
+  } else {
+    showToast('Please open the peer link sent by your teammate.', false);
+  }
+}
+
+// Handle URL hash on load
+window.addEventListener('load', () => {
+  const hash = window.location.hash;
+  if (hash.startsWith('#peer?')) {
+    loadPeerPage(hash);
+  }
+  buildStarRatings();
+  loadDraft();
+});
+
+// ═══════════════════════════════════════════
+// STAR RATINGS
+// ═══════════════════════════════════════════
+function buildStarRatings() {
+  const groups = [
+    { id: 'stars_sa', key: 'sa' },
+    { id: 'stars_cl', key: 'cl' },
+    { id: 'stars_gs', key: 'gs' },
+    { id: 'stars_tr', key: 'tr' },
+    { id: 'pstars_sa', key: 'psa' },
+    { id: 'pstars_cl', key: 'pcl' },
+    { id: 'pstars_gs', key: 'pgs' },
+    { id: 'pstars_tr', key: 'ptr' },
+  ];
+  groups.forEach(g => {
+    const el = document.getElementById(g.id);
+    if (!el) return;
+    el.innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+      const lbl = document.createElement('label');
+      lbl.textContent = '★';
+      lbl.dataset.val = i;
+      lbl.dataset.group = g.id;
+      lbl.addEventListener('click', () => setStars(g.id, i));
+      lbl.addEventListener('mouseover', () => highlightStars(g.id, i));
+      lbl.addEventListener('mouseout', () => {
+        const val = parseInt(el.dataset.value || 0);
+        highlightStars(g.id, val);
+      });
+      el.appendChild(lbl);
+    }
+    el.dataset.value = 0;
+  });
+}
+
+function setStars(groupId, val) {
+  const el = document.getElementById(groupId);
+  el.dataset.value = val;
+  highlightStars(groupId, val);
+}
+
+function highlightStars(groupId, val) {
+  const el = document.getElementById(groupId);
+  el.querySelectorAll('label').forEach(lbl => {
+    lbl.classList.toggle('active', parseInt(lbl.dataset.val) <= val);
+  });
+}
+
+function getStarValue(groupId) {
+  const el = document.getElementById(groupId);
+  return el ? parseInt(el.dataset.value || 0) : 0;
+}
+
+// ═══════════════════════════════════════════
+// STEP NAVIGATION
+// ═══════════════════════════════════════════
+function goStep(n) {
+  if (n > currentStep && !validateStep(currentStep)) return;
+  for (let i = 0; i <= 4; i++) {
+    const el = document.getElementById('step' + i);
+    if (el) el.style.display = i === n ? 'block' : 'none';
+    const dot = document.getElementById('dot' + i);
+    if (dot) {
+      dot.classList.remove('active', 'done');
+      if (i < n) dot.classList.add('done');
+      if (i === n) dot.classList.add('active');
+    }
+  }
+  currentStep = n;
+  const labels = ['Step 1 of 5','Step 2 of 5','Step 3 of 5','Step 4 of 5','Step 5 of 5'];
+  document.getElementById('progressLabel').textContent = labels[n];
+  document.getElementById('progressBar').style.width = ((n + 1) / 5 * 100) + '%';
+  window.scrollTo(0, 0);
+  saveDraft();
+}
+
+function validateStep(step) {
+  if (step === 0) {
+    const name = document.getElementById('s_name').value.trim();
+    const email = document.getElementById('s_email').value.trim();
+    if (!name) { showToast('Please enter your name.', false); return false; }
+    if (!email || !email.includes('@')) { showToast('Please enter a valid email.', false); return false; }
+  }
+  if (step === 3) {
+    if (!document.getElementById('growth_choice').value) {
+      showToast('Please select an ability domain you grew in.', false);
+      return false;
+    }
+  }
+  return true;
+}
+
+// ═══════════════════════════════════════════
+// GROWTH CHOICE
+// ═══════════════════════════════════════════
+function selectGrowth(val) {
+  document.querySelectorAll('.choice-item').forEach(el => el.classList.remove('selected'));
+  event.target.classList.add('selected');
+  document.getElementById('growth_choice').value = val;
+}
+
+// ═══════════════════════════════════════════
+// PEER LINK
+// ═══════════════════════════════════════════
+let generatedPeerLink = '';
+
+function generatePeerLink() {
+  const name = document.getElementById('s_name').value.trim();
+  const email = document.getElementById('s_email').value.trim();
+  if (!name || !email) {
+    showToast('Please fill in your name and email in Part 0 first.', false);
+    return;
+  }
+  const payload = btoa(encodeURIComponent(JSON.stringify({ name, email })));
+  const url = window.location.href.split('#')[0] + '#peer?data=' + payload;
+  generatedPeerLink = url;
+  document.getElementById('peerLinkDisplay').textContent = url;
+  document.getElementById('peerLinkDisplay').style.display = 'block';
+  document.getElementById('copyBtn').style.display = 'inline-flex';
+  showToast('✅ Peer link generated! Share it with your teammate.', true);
+}
+
+function copyPeerLink() {
+  if (!generatedPeerLink) return;
+  navigator.clipboard.writeText(generatedPeerLink).then(() => {
+    showToast('📋 Link copied to clipboard!', true);
+  });
+}
+
+// ═══════════════════════════════════════════
+// SUBMIT STUDENT
+// ═══════════════════════════════════════════
+function collectStudentData() {
+  return {
+    type: 'student_passport',
+    version: '1.0',
+    submittedAt: new Date().toISOString(),
+    basicInfo: {
+      name: document.getElementById('s_name').value.trim(),
+      email: document.getElementById('s_email').value.trim(),
+      grade: document.getElementById('s_grade').value.trim(),
+      group: document.getElementById('s_group').value.trim(),
+      academicYear: document.getElementById('s_year').value.trim(),
+    },
+    part1: {
+      SA: { score: getStarValue('stars_sa'), reason: document.getElementById('reason_sa').value.trim() },
+      CL: { score: getStarValue('stars_cl'), reason: document.getElementById('reason_cl').value.trim() },
+      GS: { score: getStarValue('stars_gs'), reason: document.getElementById('reason_gs').value.trim() },
+      TR: { score: getStarValue('stars_tr'), reason: document.getElementById('reason_tr').value.trim() },
+    },
+    part2: {
+      role: document.getElementById('ev1').value.trim(),
+      contribution: document.getElementById('ev2').value.trim(),
+      challenge: document.getElementById('ev3').value.trim(),
+    },
+    part3: {
+      growthDomain: document.getElementById('growth_choice').value,
+      reason: document.getElementById('growth_why').value.trim(),
+    },
+    part4_peer: null, // filled by peer separately
+    part5_supervisor: null, // filled by teacher
+  };
+}
+
+function submitStudentForm() {
+  if (!validateStep(currentStep)) return;
+  const data = collectStudentData();
+  const filename = 'SPARKS_' + (data.basicInfo.name.replace(/\s+/g,'_') || 'student') + '_passport.json';
+  downloadJSON(data, filename);
+  localStorage.removeItem('sparks_draft');
+  showToast('✅ Passport submitted! JSON downloaded.', true);
+}
+
+// ═══════════════════════════════════════════
+// PEER PAGE
+// ═══════════════════════════════════════════
+function loadPeerPage(hash) {
+  try {
+    const query = hash.replace('#peer?data=', '');
+    const decoded = JSON.parse(decodeURIComponent(atob(query)));
+    peerStudentInfo = decoded;
+    document.getElementById('peerStudentInfo').innerHTML =
+      `<strong>Giving feedback for:</strong> ${decoded.name} (${decoded.email})`;
+    showPage('peer');
+  } catch (e) {
+    showPage('peer');
+    document.getElementById('peerStudentInfo').innerHTML = '<span style="color:var(--danger)">⚠️ Invalid peer link. Please ask your teammate to generate a new one.</span>';
+  }
+}
+
+function submitPeerFeedback() {
+  const peerName = document.getElementById('peer_name').value.trim();
+  if (!peerName) { showToast('Please enter your name.', false); return; }
+
+  const data = {
+    type: 'peer_feedback',
+    version: '1.0',
+    submittedAt: new Date().toISOString(),
+    forStudent: peerStudentInfo || { name: 'Unknown', email: 'unknown' },
+    peerName,
+    contribution: document.getElementById('peer_contribution').value.trim(),
+    scores: {
+      SA: { score: getStarValue('pstars_sa'), reason: document.getElementById('preason_sa').value.trim() },
+      CL: { score: getStarValue('pstars_cl'), reason: document.getElementById('preason_cl').value.trim() },
+      GS: { score: getStarValue('pstars_gs'), reason: document.getElementById('preason_gs').value.trim() },
+      TR: { score: getStarValue('pstars_tr'), reason: document.getElementById('preason_tr').value.trim() },
+    }
+  };
+  const stuName = (peerStudentInfo?.name || 'student').replace(/\s+/g,'_');
+  downloadJSON(data, 'SPARKS_' + stuName + '_peer.json');
+  showToast('✅ Peer feedback submitted! JSON downloaded.', true);
+}
+
+// ═══════════════════════════════════════════
+// TEACHER LOGIN
+// ═══════════════════════════════════════════
+function teacherLogin() {
+  const pwd = document.getElementById('teacherPwd').value;
+  if (pwd === TEACHER_PASSWORD) {
+    document.getElementById('loginError').style.display = 'none';
+    showPage('teacher');
+    renderStudentList();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('teacherPwd').value = '';
+  }
+}
+
+function teacherLogout() {
+  document.getElementById('teacherPwd').value = '';
+  showPage('home');
+}
+
+// ═══════════════════════════════════════════
+// TEACHER: LOAD JSON
+// ═══════════════════════════════════════════
+function loadStudentJSON(event) {
+  const files = Array.from(event.target.files);
+  let loaded = 0;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const data = JSON.parse(e.target.result);
+        mergeStudentData(data);
+        loaded++;
+        if (loaded === files.length) {
+          renderStudentList();
+          showToast('✅ ' + loaded + ' file(s) loaded.', true);
+        }
+      } catch {
+        showToast('⚠️ Failed to parse: ' + file.name, false);
+      }
+    };
+    reader.readAsText(file);
+  });
+  event.target.value = '';
+}
+
+function mergeStudentData(data) {
+  if (data.type === 'student_passport') {
+    const key = data.basicInfo.email || data.basicInfo.name;
+    const existing = loadedStudents.find(s => s.basicInfo.email === key || s.basicInfo.name === data.basicInfo.name);
+    if (existing) {
+      Object.assign(existing, data);
+    } else {
+      loadedStudents.push(data);
+    }
+  } else if (data.type === 'peer_feedback') {
+    const key = data.forStudent.email || data.forStudent.name;
+    const student = loadedStudents.find(s => s.basicInfo.email === key || s.basicInfo.name === data.forStudent.name);
+    if (student) {
+      student.part4_peer = data;
+    } else {
+      // Create placeholder
+      loadedStudents.push({
+        type: 'student_passport',
+        basicInfo: data.forStudent,
+        part1: null,
+        part4_peer: data,
+        part5_supervisor: null,
+      });
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+// TEACHER: RENDER STUDENT LIST
+// ═══════════════════════════════════════════
+function renderStudentList() {
+  const container = document.getElementById('studentList');
+  if (loadedStudents.length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:var(--muted);font-size:14px;padding:40px">No submissions loaded yet. Import JSON files above.</p>';
+    return;
+  }
+
+  container.innerHTML = '';
+  loadedStudents.forEach((student, idx) => {
+    const card = buildStudentCard(student, idx);
+    container.appendChild(card);
+  });
+}
+
+function buildStudentCard(student, idx) {
+  const div = document.createElement('div');
+  div.className = 'student-summary-card';
+  const info = student.basicInfo || {};
+  const initial = (info.name || '?')[0].toUpperCase();
+  const p1 = student.part1 || {};
+  const peer = student.part4_peer?.scores || {};
+  const sup = student.part5_supervisor?.scores || {};
+
+  // Chips
+  const chips = ABILITIES.map(a => {
+    const s = p1[a]?.score || 0;
+    return `<span class="score-chip chip-${a.toLowerCase()}">${a}: ${s}/5</span>`;
+  }).join('');
+
+  div.innerHTML = `
+    <div class="stu-header">
+      <div class="stu-avatar">${initial}</div>
+      <div class="stu-info">
+        <h3>${info.name || 'Unknown'}</h3>
+        <p>${info.email || ''} · Grade ${info.grade || '-'} · Group ${info.group || '-'}</p>
+      </div>
+    </div>
+    <div class="score-chips">${chips}</div>
+
+    <div style="margin-top:20px">
+      <div class="radar-container"><canvas id="radar_${idx}"></canvas></div>
+    </div>
+
+    <details style="margin-top:16px">
+      <summary>📝 Part 2: Evidence of Learning</summary>
+      <div class="detail-body">
+        <strong>Role:</strong> ${student.part2?.role || '—'}<br><br>
+        <strong>Contribution:</strong> ${student.part2?.contribution || '—'}<br><br>
+        <strong>Challenge:</strong> ${student.part2?.challenge || '—'}
+      </div>
+    </details>
+
+    <details>
+      <summary>💭 Part 3: Reflection</summary>
+      <div class="detail-body">
+        <strong>Domain of most growth:</strong> ${student.part3?.growthDomain ? ABILITY_NAMES[student.part3.growthDomain] : '—'}<br><br>
+        <strong>Reason:</strong> ${student.part3?.reason || '—'}
+      </div>
+    </details>
+
+    <details>
+      <summary>🤝 Part 4: Peer Feedback ${student.part4_peer ? '✅' : '(not yet received)'}</summary>
+      <div class="detail-body" id="peer_detail_${idx}">
+        ${student.part4_peer ? buildPeerDetail(student.part4_peer) : '<em>No peer feedback file loaded yet.</em>'}
+      </div>
+    </details>
+
+    <div class="supervisor-block">
+      <h4>👩‍🏫 Part 5: Supervisor Evaluation</h4>
+      ${ABILITIES.map(a => `
+        <div class="sup-ability-row">
+          <label>${a} – ${ABILITY_NAMES[a].split(' ')[0]}</label>
+          <input type="number" min="1" max="5" value="${student.part5_supervisor?.scores?.[a]?.score || ''}"
+            placeholder="1-5" id="sup_${idx}_${a}_score"
+            onchange="updateSupData(${idx})">
+          <input type="text" value="${student.part5_supervisor?.scores?.[a]?.reason || ''}"
+            placeholder="Comment..." id="sup_${idx}_${a}_reason"
+            onchange="updateSupData(${idx})">
+        </div>
+      `).join('')}
+      <div style="margin-top:14px">
+        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px">Overall Supervisor Comment</label>
+        <textarea style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit;min-height:70px"
+          id="sup_${idx}_comment" placeholder="Write overall supervisor comment..."
+          onchange="updateSupData(${idx})">${student.part5_supervisor?.comment || ''}</textarea>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm" onclick="saveSupData(${idx})">💾 Save</button>
+        <button class="btn btn-outline btn-sm" onclick="downloadStudentFull(${idx})">⬇️ Export Full Report</button>
+      </div>
+    </div>
+  `;
+
+  // Render radar after insert
+  setTimeout(() => renderRadar(idx, student), 50);
+  return div;
+}
+
+function buildPeerDetail(pf) {
+  if (!pf) return '';
+  const scores = pf.scores || {};
+  return `
+    <strong>Peer:</strong> ${pf.peerName || '—'}<br><br>
+    <strong>Greatest contribution:</strong> ${pf.contribution || '—'}<br><br>
+    <strong>Scores:</strong><br>
+    ${ABILITIES.map(a =>
+      `${a}: ${scores[a]?.score || '—'}/5 — ${scores[a]?.reason || ''}`
+    ).join('<br>')}
+  `;
+}
+
+// ═══════════════════════════════════════════
+// SUPERVISOR DATA
+// ═══════════════════════════════════════════
+function updateSupData(idx) {
+  const student = loadedStudents[idx];
+  if (!student.part5_supervisor) student.part5_supervisor = { scores: {} };
+  ABILITIES.forEach(a => {
+    const score = parseInt(document.getElementById(`sup_${idx}_${a}_score`)?.value) || 0;
+    const reason = document.getElementById(`sup_${idx}_${a}_reason`)?.value || '';
+    student.part5_supervisor.scores[a] = { score, reason };
+  });
+  student.part5_supervisor.comment = document.getElementById(`sup_${idx}_comment`)?.value || '';
+  // Re-render radar
+  if (radarCharts[idx]) {
+    radarCharts[idx].destroy();
+    delete radarCharts[idx];
+  }
+  renderRadar(idx, student);
+}
+
+function saveSupData(idx) {
+  updateSupData(idx);
+  showToast('💾 Supervisor data saved.', true);
+}
+
+// ═══════════════════════════════════════════
+// RADAR CHART
+// ═══════════════════════════════════════════
+function renderRadar(idx, student) {
+  const ctx = document.getElementById('radar_' + idx);
+  if (!ctx) return;
+  if (radarCharts[idx]) radarCharts[idx].destroy();
+
+  const labels = ABILITIES.map(a => ABILITY_NAMES[a]);
+  const p1 = student.part1 || {};
+  const peer = student.part4_peer?.scores || {};
+  const sup = student.part5_supervisor?.scores || {};
+
+  const selfScores = ABILITIES.map(a => p1[a]?.score || 0);
+  const peerScores = ABILITIES.map(a => peer[a]?.score || 0);
+  const supScores  = ABILITIES.map(a => sup[a]?.score  || 0);
+
+  const hasPeer = peerScores.some(s => s > 0);
+  const hasSup  = supScores.some(s => s > 0);
+
+  const datasets = [
+    {
+      label: 'Self-Evaluation',
+      data: selfScores,
+      backgroundColor: 'rgba(78,145,213,.15)',
+      borderColor: '#4e91d5',
+      borderWidth: 2,
+      pointBackgroundColor: '#4e91d5',
+      pointRadius: 4,
+    }
+  ];
+  if (hasSup) datasets.push({
+    label: 'Supervisor',
+    data: supScores,
+    backgroundColor: 'rgba(155,89,182,.12)',
+    borderColor: '#9b59b6',
+    borderWidth: 2,
+    pointBackgroundColor: '#9b59b6',
+    pointRadius: 4,
+  });
+  if (hasPeer) datasets.push({
+    label: 'Peer',
+    data: peerScores,
+    backgroundColor: 'rgba(46,204,113,.12)',
+    borderColor: '#2ecc71',
+    borderWidth: 2,
+    pointBackgroundColor: '#2ecc71',
+    pointRadius: 4,
+  });
+
+  radarCharts[idx] = new Chart(ctx, {
+    type: 'radar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          min: 0,
+          max: 5,
+          ticks: { stepSize: 1, font: { size: 11 } },
+          pointLabels: { font: { size: 12, weight: '600' }, color: '#2c3e50' },
+          grid: { color: '#e0e8f0' },
+        }
+      },
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 16 } }
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════
+function downloadStudentFull(idx) {
+  const student = loadedStudents[idx];
+  updateSupData(idx);
+  const filename = 'SPARKS_' + (student.basicInfo?.name?.replace(/\s+/g,'_') || 'student') + '_full.json';
+  downloadJSON(student, filename);
+  showToast('⬇️ Full report downloaded.', true);
+}
+
+function downloadJSON(data, filename) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ═══════════════════════════════════════════
+// DRAFT SAVE/LOAD
+// ═══════════════════════════════════════════
+function saveDraft() {
+  const draft = {
+    name: document.getElementById('s_name').value,
+    email: document.getElementById('s_email').value,
+    grade: document.getElementById('s_grade').value,
+    group: document.getElementById('s_group').value,
+    year: document.getElementById('s_year').value,
+    sa: getStarValue('stars_sa'),
+    cl: getStarValue('stars_cl'),
+    gs: getStarValue('stars_gs'),
+    tr: getStarValue('stars_tr'),
+    reason_sa: document.getElementById('reason_sa').value,
+    reason_cl: document.getElementById('reason_cl').value,
+    reason_gs: document.getElementById('reason_gs').value,
+    reason_tr: document.getElementById('reason_tr').value,
+    ev1: document.getElementById('ev1').value,
+    ev2: document.getElementById('ev2').value,
+    ev3: document.getElementById('ev3').value,
+    growth_choice: document.getElementById('growth_choice').value,
+    growth_why: document.getElementById('growth_why').value,
+  };
+  localStorage.setItem('sparks_draft', JSON.stringify(draft));
+}
+
+function loadDraft() {
+  try {
+    const d = JSON.parse(localStorage.getItem('sparks_draft'));
+    if (!d) return;
+    document.getElementById('s_name').value = d.name || '';
+    document.getElementById('s_email').value = d.email || '';
+    document.getElementById('s_grade').value = d.grade || '';
+    document.getElementById('s_group').value = d.group || '';
+    document.getElementById('s_year').value = d.year || '2025/2026';
+    if (d.sa) setStars('stars_sa', d.sa);
+    if (d.cl) setStars('stars_cl', d.cl);
+    if (d.gs) setStars('stars_gs', d.gs);
+    if (d.tr) setStars('stars_tr', d.tr);
+    document.getElementById('reason_sa').value = d.reason_sa || '';
+    document.getElementById('reason_cl').value = d.reason_cl || '';
+    document.getElementById('reason_gs').value = d.reason_gs || '';
+    document.getElementById('reason_tr').value = d.reason_tr || '';
+    document.getElementById('ev1').value = d.ev1 || '';
+    document.getElementById('ev2').value = d.ev2 || '';
+    document.getElementById('ev3').value = d.ev3 || '';
+    document.getElementById('growth_choice').value = d.growth_choice || '';
+    document.getElementById('growth_why').value = d.growth_why || '';
+    if (d.growth_choice) {
+      document.querySelectorAll('.choice-item').forEach(el => {
+        if (el.textContent.includes(d.growth_choice) || el.onclick?.toString().includes(d.growth_choice)) {
+          // can't easily re-highlight, handled on page interaction
+        }
+      });
+    }
+  } catch {}
+}
+
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
+let toastTimer = null;
+function showToast(msg, success = true) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast show' + (success ? ' success' : '');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { toast.className = 'toast'; }, 3000);
+}
+</script>
+</body>
+</html>
