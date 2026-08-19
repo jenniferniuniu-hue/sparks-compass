@@ -693,15 +693,13 @@ const ABILITIES = ['SA','CL','GS','TR'];
 const ABILITY_NAMES = { SA:'Self & Agency', CL:'Collaboration & Leadership', GS:'Global Citizenship & Service', TR:'Thinking & Reflection' };
 
 // ── Supabase Config ──
-// Replace these with your Supabase project credentials
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_URL = 'https://ivsbkiprsesmtbiqowzp.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_A-AnlNai5WOyzsVnSqZigA_TcPU6V8Z';
 
 let sb = null;
 try {
-  if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  console.log('Supabase connected');
 } catch(e) { console.warn('Supabase init failed:', e); }
 
 function isOnline() { return sb !== null; }
@@ -1066,7 +1064,6 @@ async function loadAllStudents() {
     try {
       const { data, error } = await sb.from('submissions').select('*').order('created_at', { ascending: true });
       if (error) throw error;
-      // Group by student_key
       const map = {};
       (data || []).forEach(row => {
         if (!map[row.student_key]) map[row.student_key] = { basicInfo: null, part1: null, part2: null, part3: null, peers: [], supervisors: [] };
@@ -1105,11 +1102,11 @@ async function loadAllStudents() {
 function updateDataStatus() {
   const el = document.getElementById('dataStatus');
   if (!el) return;
-  const students = JSON.parse(localStorage.getItem('sparks_students') || '[]');
-  const peers = JSON.parse(localStorage.getItem('sparks_peers') || '[]');
-  const supervisors = JSON.parse(localStorage.getItem('sparks_supervisors') || '[]');
   const online = isOnline();
-  el.innerHTML = `<strong>Storage:</strong> ${online ? '☁️ Supabase (Online)' : '💻 localStorage (Offline — data only on this device)'} &nbsp;|&nbsp; Students: ${students.length} &nbsp;|&nbsp; Peer feedback: ${peers.length} &nbsp;|&nbsp; Supervisor evals: ${supervisors.length}` + (online ? '' : '<br><span style="color:var(--danger);font-weight:600">⚠️ Offline mode: Peer/Supervisor data from other devices will NOT appear here. Connect Supabase to sync across devices.</span>');
+  const stuCount = loadedStudents.length;
+  const peerCount = loadedStudents.reduce((a,s) => a + (s.peers?.length || 0), 0);
+  const supCount = loadedStudents.reduce((a,s) => a + (s.supervisors?.length || 0), 0);
+  el.innerHTML = `<strong>Storage:</strong> ${online ? '☁️ Supabase (Online)' : '💻 localStorage (Offline — data only on this device)'} &nbsp;|&nbsp; Students: ${stuCount} &nbsp;|&nbsp; Peer feedback: ${peerCount} &nbsp;|&nbsp; Supervisor evals: ${supCount}` + (online ? '' : '<br><span style="color:var(--danger);font-weight:600">⚠️ Offline mode: Peer/Supervisor data from other devices will NOT appear here. Connect Supabase to sync across devices.</span>');
 }
 
 function refreshStudents() { loadAllStudents(); }
@@ -1167,7 +1164,7 @@ function loadTestData() {
     comment: 'Alex is an outstanding student who shows great potential. The ability to balance self-direction with collaboration is impressive. I would encourage more critical reflection on personal biases.',
   };
 
-  // Save to localStorage
+  // Save to localStorage (fallback)
   const students = JSON.parse(localStorage.getItem('sparks_students') || '[]');
   const existIdx = students.findIndex(s => s.basicInfo?.email === 'alex@test.com');
   if (existIdx >= 0) students[existIdx] = testStudent; else students.push(testStudent);
@@ -1175,15 +1172,26 @@ function loadTestData() {
 
   const peers = JSON.parse(localStorage.getItem('sparks_peers') || '[]');
   const existPeerIdx = peers.findIndex(p => p.forStudent?.email === 'alex@test.com');
-  if (existPeerIdx >= 0) peers.splice(existPeerIdx, 1); // remove old
+  if (existPeerIdx >= 0) peers.splice(existPeerIdx, 1);
   peers.push(testPeer1);
   localStorage.setItem('sparks_peers', JSON.stringify(peers));
 
   const supervisors = JSON.parse(localStorage.getItem('sparks_supervisors') || '[]');
   const existSupIdx = supervisors.findIndex(s => s.forStudent?.email === 'alex@test.com');
-  if (existSupIdx >= 0) supervisors.splice(existSupIdx, 1); // remove old
+  if (existSupIdx >= 0) supervisors.splice(existSupIdx, 1);
   supervisors.push(testSupervisor);
   localStorage.setItem('sparks_supervisors', JSON.stringify(supervisors));
+
+  // Also write to Supabase if online
+  if (isOnline()) {
+    (async () => {
+      try {
+        await sb.from('submissions').upsert({ type: 'student', student_key: 'alex@test.com', data: testStudent }, { onConflict: 'student_key,type' });
+        await sb.from('submissions').insert({ type: 'peer', student_key: 'alex@test.com', data: testPeer1 });
+        await sb.from('submissions').insert({ type: 'supervisor', student_key: 'alex@test.com', data: testSupervisor });
+      } catch(e) { console.warn('Supabase test data write failed:', e); }
+    })();
+  }
 
   showToast('✅ Test data loaded! Click Refresh to see it.', true);
   loadAllStudents();
