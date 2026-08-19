@@ -401,6 +401,7 @@
   </div>
   <div id="navRight">
     <button class="nav-btn" onclick="goHome()">🏠 Home</button>
+    <button class="nav-btn" style="color:#e74c3c" onclick="resetAllData()">🗑️ Reset</button>
   </div>
 </nav>
 
@@ -450,14 +451,13 @@
         collaborate with others, and reflect on their personal growth.
       </div><br>
       <div class="form-row">
-        <div class="form-group"><label>Student Name *</label><input type="text" id="s_name" placeholder="Your full name"></div>
-        <div class="form-group"><label>Email Address *</label><input type="email" id="s_email" placeholder="your@email.com"></div>
+        <div class="form-group"><label>Student Name * <span style="font-weight:400;font-size:11px;color:var(--muted)">(名+姓 / First Name + Last Name)</span></label><input type="text" id="s_name" placeholder="First Name + Last Name" required></div>
+        <div class="form-group"><label>Email Address *</label><input type="email" id="s_email" placeholder="your@email.com" required></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Grade</label><input type="text" id="s_grade" placeholder="e.g. Grade 10"></div>
-        <div class="form-group"><label>Group</label><input type="text" id="s_group" placeholder="e.g. Group A"></div>
+        <div class="form-group"><label>Grade *</label><select id="s_grade" required><option value="">-- Select --</option><option value="G7">G7</option><option value="G8">G8</option><option value="G9">G9</option><option value="FAP">FAP</option><option value="Sparks">Sparks</option><option value="FP">FP</option><option value="DP1">DP1</option><option value="DP2">DP2</option></select></div>
+        <div class="form-group"><label>Name of Group *</label><input type="text" id="s_group" placeholder="e.g. Group A" required></div>
       </div>
-      <div class="form-group"><label>Academic Year</label><input type="text" id="s_year" value="2025/2026"></div>
       <div class="action-row"><button class="btn btn-primary" onclick="goStep(1)">Next →</button></div>
     </div>
   </div>
@@ -479,26 +479,26 @@
       <div class="ability-block sa">
         <div class="ability-title">SA — Self &amp; Agency</div>
         <div class="ability-desc">I can set personal learning goals and proactively seek resources to complete tasks.<br><small>Alignment with UWC: Self-Management, Project Management (personal level)</small></div>
-        <div class="score-row"><label>Your score</label><div class="star-rating" id="stars_sa"></div></div>
-        <input type="text" class="reason-input" id="reason_sa" placeholder="Reason / evidence for your self-score...">
+        <div class="score-row"><label>Your score *</label><div class="star-rating" id="stars_sa"></div></div>
+        <input type="text" class="reason-input" id="reason_sa" placeholder="Reason / evidence for your self-score... *">
       </div>
       <div class="ability-block cl">
         <div class="ability-title">CL — Collaboration &amp; Leadership</div>
         <div class="ability-desc">I listen to others' perspectives and work toward balanced solutions when conflicts arise.<br><small>Alignment with UWC: Social Skills, Communication Skills, Pedagogical Skills</small></div>
-        <div class="score-row"><label>Your score</label><div class="star-rating" id="stars_cl"></div></div>
-        <input type="text" class="reason-input" id="reason_cl" placeholder="Reason / evidence for your self-score...">
+        <div class="score-row"><label>Your score *</label><div class="star-rating" id="stars_cl"></div></div>
+        <input type="text" class="reason-input" id="reason_cl" placeholder="Reason / evidence for your self-score... *">
       </div>
       <div class="ability-block gs">
         <div class="ability-title">GS — Global Citizenship &amp; Service</div>
         <div class="ability-desc">I am aware of global issues and reflect on how my actions can positively impact my community.<br><small>Alignment with UWC: Project Management (action level), Digital Skills</small></div>
-        <div class="score-row"><label>Your score</label><div class="star-rating" id="stars_gs"></div></div>
-        <input type="text" class="reason-input" id="reason_gs" placeholder="Reason / evidence for your self-score...">
+        <div class="score-row"><label>Your score *</label><div class="star-rating" id="stars_gs"></div></div>
+        <input type="text" class="reason-input" id="reason_gs" placeholder="Reason / evidence for your self-score... *">
       </div>
       <div class="ability-block tr">
         <div class="ability-title">TR — Thinking &amp; Reflection</div>
         <div class="ability-desc">I use different thinking frameworks to analyse problems and objectively evaluate my strengths and areas for improvement.<br><small>Alignment with UWC: Thinking Skills, Research Skills</small></div>
-        <div class="score-row"><label>Your score</label><div class="star-rating" id="stars_tr"></div></div>
-        <input type="text" class="reason-input" id="reason_tr" placeholder="Reason / evidence for your self-score...">
+        <div class="score-row"><label>Your score *</label><div class="star-rating" id="stars_tr"></div></div>
+        <input type="text" class="reason-input" id="reason_tr" placeholder="Reason / evidence for your self-score... *">
       </div>
       <div class="action-row">
         <button class="btn btn-outline" onclick="goStep(0)">← Back</button>
@@ -512,9 +512,9 @@
     <div class="card">
       <div class="card-header"><span class="badge">PART 2</span><h2>Evidence of Learning</h2></div>
       <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Please give concrete examples of your performance in this project.</p>
-      <div class="form-group"><label>1. Your role in this project / 你在这个项目中的角色</label><textarea id="ev1" placeholder="Describe your role and responsibilities..."></textarea></div>
-      <div class="form-group"><label>2. A specific contribution you made to your team / 你对团队的具体贡献</label><textarea id="ev2" placeholder="Give a specific example..."></textarea></div>
-      <div class="form-group"><label>3. A challenge you faced and how you addressed it / 你遇到的挑战及解决方法</label><textarea id="ev3" placeholder="Describe a challenge and your response..."></textarea></div>
+      <div class="form-group"><label>1. Your role in this project / 你在这个项目中的角色 *</label><textarea id="ev1" placeholder="Describe your role and responsibilities..."></textarea></div>
+      <div class="form-group"><label>2. A specific contribution you made to your team / 你对团队的具体贡献 *</label><textarea id="ev2" placeholder="Give a specific example..."></textarea></div>
+      <div class="form-group"><label>3. A challenge you faced and how you addressed it / 你遇到的挑战及解决方法 *</label><textarea id="ev3" placeholder="Describe a challenge and your response..."></textarea></div>
       <div class="action-row">
         <button class="btn btn-outline" onclick="goStep(1)">← Back</button>
         <button class="btn btn-primary" onclick="goStep(3)">Next →</button>
@@ -527,7 +527,7 @@
     <div class="card">
       <div class="card-header"><span class="badge">PART 3</span><h2>Reflection</h2></div>
       <div class="form-group">
-        <label>1. Which ability domain do you feel you grew the most in this project? / 你在哪个能力领域成长最多？</label>
+        <label>1. Which ability domain do you feel you grew the most in this project? / 你在哪个能力领域成长最多？ *</label>
         <div class="choice-grid" style="margin-top:10px">
           <div class="choice-item" onclick="selectGrowth(this,'SA')">⭐ Self &amp; Agency</div>
           <div class="choice-item" onclick="selectGrowth(this,'CL')">🤝 Collaboration &amp; Leadership</div>
@@ -537,7 +537,7 @@
         <input type="hidden" id="growth_choice" value="">
       </div>
       <div class="form-group" style="margin-top:20px">
-        <label>2. Why? / 为什么？</label>
+        <label>2. Why? / 为什么？ *</label>
         <textarea id="growth_why" placeholder="Explain why you chose this domain..."></textarea>
       </div>
       <div class="action-row">
@@ -726,6 +726,17 @@ function goHome() {
   showPage('home');
 }
 
+function resetAllData() {
+  if (confirm('Clear all saved data? This will erase your draft and submissions from this browser.')) {
+    localStorage.removeItem('sparks_draft');
+    localStorage.removeItem('sparks_students');
+    localStorage.removeItem('sparks_peers');
+    localStorage.removeItem('sparks_supervisors');
+    showToast('All data cleared!', true);
+    goHome();
+  }
+}
+
 function showTeacherLogin() { showPage('teacher-login'); }
 
 // Handle hash routing on load
@@ -792,9 +803,24 @@ function validateStep(step) {
   if (step === 0) {
     if (!document.getElementById('s_name').value.trim()) { showToast('Please enter your name.', false); return false; }
     if (!document.getElementById('s_email').value.trim().includes('@')) { showToast('Please enter a valid email.', false); return false; }
+    if (!document.getElementById('s_grade').value) { showToast('Please select your grade.', false); return false; }
+    if (!document.getElementById('s_group').value.trim()) { showToast('Please enter your group name.', false); return false; }
+  }
+  if (step === 1) {
+    const abilities = ['SA','CL','GS','TR'];
+    for (const a of abilities) {
+      if (getStarValue('stars_' + a.toLowerCase()) === 0) { showToast('Please rate ' + a + ' (1–5 stars).', false); return false; }
+      if (!document.getElementById('reason_' + a.toLowerCase()).value.trim()) { showToast('Please provide a reason for your ' + a + ' score.', false); return false; }
+    }
+  }
+  if (step === 2) {
+    if (!document.getElementById('ev1').value.trim()) { showToast('Please describe your role in the project.', false); return false; }
+    if (!document.getElementById('ev2').value.trim()) { showToast('Please describe your contribution.', false); return false; }
+    if (!document.getElementById('ev3').value.trim()) { showToast('Please describe a challenge you faced.', false); return false; }
   }
   if (step === 3) {
     if (!document.getElementById('growth_choice').value) { showToast('Please select an ability domain you grew in.', false); return false; }
+    if (!document.getElementById('growth_why').value.trim()) { showToast('Please explain why you chose this domain.', false); return false; }
   }
   return true;
 }
@@ -815,9 +841,8 @@ function collectStudentData() {
     basicInfo: {
       name: document.getElementById('s_name').value.trim(),
       email: document.getElementById('s_email').value.trim(),
-      grade: document.getElementById('s_grade').value.trim(),
+      grade: document.getElementById('s_grade').value,
       group: document.getElementById('s_group').value.trim(),
-      academicYear: document.getElementById('s_year').value.trim(),
     },
     part1: {
       SA: { score: getStarValue('stars_sa'), reason: document.getElementById('reason_sa').value.trim() },
@@ -1096,7 +1121,7 @@ function loadTestData() {
   const testStudent = {
     type: 'student',
     submittedAt: new Date().toISOString(),
-    basicInfo: { name: 'Alex Chen', email: 'alex@test.com', grade: '10', group: 'A', academicYear: '2025/2026' },
+    basicInfo: { name: 'Alex Chen', email: 'alex@test.com', grade: 'DP1', group: 'A' },
     part1: {
       SA: { score: 4, reason: 'I took initiative to lead the research phase and managed my time well.' },
       CL: { score: 3, reason: 'I collaborated with my team but sometimes struggled to delegate tasks.' },
@@ -1226,7 +1251,7 @@ function buildStudentCard(stu, idx) {
       <div class="stu-avatar">${initial}</div>
       <div class="stu-info">
         <h3>${info.name || 'Unknown'}</h3>
-        <p>${info.email || ''} · Grade ${info.grade || '-'} · Group ${info.group || '-'} · AY ${info.academicYear || '-'}
+        <p>${info.email || ''} · Grade ${info.grade || '-'} · Group ${info.group || '-'}
           &nbsp; <span class="status-badge ${peerCount?'received':'pending'}">Peer: ${peerCount?'✅':'⏳'}</span>
           &nbsp; <span class="status-badge ${supCount?'received':'pending'}">Sup: ${supCount?'✅':'⏳'}</span>
         </p>
@@ -1452,7 +1477,6 @@ function saveDraft() {
     email: document.getElementById('s_email')?.value,
     grade: document.getElementById('s_grade')?.value,
     group: document.getElementById('s_group')?.value,
-    year: document.getElementById('s_year')?.value,
     sa: getStarValue('stars_sa'), cl: getStarValue('stars_cl'),
     gs: getStarValue('stars_gs'), tr: getStarValue('stars_tr'),
     reason_sa: document.getElementById('reason_sa')?.value,
@@ -1476,7 +1500,6 @@ function loadDraft() {
     if (document.getElementById('s_email')) document.getElementById('s_email').value = d.email || '';
     if (document.getElementById('s_grade')) document.getElementById('s_grade').value = d.grade || '';
     if (document.getElementById('s_group')) document.getElementById('s_group').value = d.group || '';
-    if (document.getElementById('s_year')) document.getElementById('s_year').value = d.year || '2025/2026';
     if (d.sa) setStars('stars_sa', d.sa);
     if (d.cl) setStars('stars_cl', d.cl);
     if (d.gs) setStars('stars_gs', d.gs);
